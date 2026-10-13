@@ -45,9 +45,9 @@ app.post('/api/auth/login', async (req, res) => {
 // Protected route - Get user profile
 app.get('/api/users/:id', authMiddleware, async (req: AuthRequest, res) => {
   try {
-    const user = await prisma.user.findUnique({
-      where: { id: req.params.id },
-      select: { id: true, email: true, name: true, createdAt: true },
+const userId = parseInt(req.params.id);
+const user = await prisma.user.findUnique({
+  where: { id: userId },      select: { id: true, email: true, name: true, createdAt: true },
     });
 
     if (!user) {

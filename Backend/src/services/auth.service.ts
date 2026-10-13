@@ -48,7 +48,7 @@ export const authService = {
       },
     });
 
-    const token = this.generateToken(user.id);
+    const token = this.generateToken(String(user.id));
     return { user: { id: user.id, email: user.email, name: user.name }, token };
   },
 
@@ -64,7 +64,7 @@ export const authService = {
       throw new Error('Invalid credentials');
     }
 
-    const token = this.generateToken(user.id);
+    const token = this.generateToken(String(user.id));
     return { user: { id: user.id, email: user.email, name: user.name }, token };
   },
 };
