@@ -39,17 +39,30 @@ export const authService = {
       throw new Error('User already exists');
     }
 
+    const username = email.split('@')[0] + '_' + Date.now();
     const hashedPassword = await this.hashPassword(password);
+    
     const user = await prisma.user.create({
       data: {
         email,
         password: hashedPassword,
         name,
+        username,
       },
     });
 
     const token = this.generateToken(String(user.id));
-    return { user: { id: user.id, email: user.email, name: user.name }, token };
+    return {
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        username: user.username,
+        avatar: user.avatar,
+        bio: user.bio,
+      },
+      token,
+    };
   },
 
   // Login user
@@ -65,6 +78,16 @@ export const authService = {
     }
 
     const token = this.generateToken(String(user.id));
-    return { user: { id: user.id, email: user.email, name: user.name }, token };
+    return {
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        username: user.username,
+        avatar: user.avatar,
+        bio: user.bio,
+      },
+      token,
+    };
   },
 };
