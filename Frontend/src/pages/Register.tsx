@@ -14,11 +14,11 @@ export default function Register() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  
+
   // UI state
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  
+
   // Auth context hooks
   const { register } = useAuth();
   const navigate = useNavigate();
@@ -44,7 +44,7 @@ export default function Register() {
       // Call auth context register function
       // This makes API call and stores token/user in localStorage
       await register(email, password, name);
-      
+
       // Redirect to home page on success
       navigate('/');
     } catch (err: any) {
@@ -68,9 +68,7 @@ export default function Register() {
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Name input */}
           <div>
-            <label className="block text-sm font-medium mb-2 text-light-text dark:text-dark-text">
-              Name
-            </label>
+            <label className="block text-sm font-medium mb-2 text-light-text dark:text-dark-text">Name</label>
             <input
               type="text"
               value={name}
@@ -82,9 +80,7 @@ export default function Register() {
 
           {/* Email input */}
           <div>
-            <label className="block text-sm font-medium mb-2 text-light-text dark:text-dark-text">
-              Email
-            </label>
+            <label className="block text-sm font-medium mb-2 text-light-text dark:text-dark-text">Email</label>
             <input
               type="email"
               value={email}
@@ -96,9 +92,7 @@ export default function Register() {
 
           {/* Password input */}
           <div>
-            <label className="block text-sm font-medium mb-2 text-light-text dark:text-dark-text">
-              Password
-            </label>
+            <label className="block text-sm font-medium mb-2 text-light-text dark:text-dark-text">Password</label>
             <input
               type="password"
               value={password}
@@ -110,9 +104,7 @@ export default function Register() {
 
           {/* Confirm password input */}
           <div>
-            <label className="block text-sm font-medium mb-2 text-light-text dark:text-dark-text">
-              Confirm Password
-            </label>
+            <label className="block text-sm font-medium mb-2 text-light-text dark:text-dark-text">Confirm Password</label>
             <input
               type="password"
               value={confirmPassword}
@@ -133,4 +125,20 @@ export default function Register() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-2 bg-light-primary dark:bg-dark-primary text-white
+            className="w-full py-2 bg-light-primary dark:bg-dark-primary text-white font-semibold rounded-lg hover:opacity-90 disabled:opacity-50 transition-opacity"
+          >
+            {loading ? 'Registering...' : 'Register'}
+          </button>
+        </form>
+
+        {/* Link to login page */}
+        <p className="mt-6 text-center text-light-text dark:text-dark-text">
+          Already have an account?{' '}
+          <a href="/login" className="text-light-primary dark:text-dark-primary hover:underline">
+            Login
+          </a>
+        </p>
+      </div>
+    </div>
+  );
+}

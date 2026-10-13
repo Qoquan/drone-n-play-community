@@ -12,11 +12,11 @@ export default function Login() {
   // Form state
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  
+
   // UI state
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  
+
   // Auth context hooks
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -36,7 +36,7 @@ export default function Login() {
       // This makes API call to /api/auth/login
       // Returns user data and JWT token
       await login(email, password);
-      
+
       // Redirect to home page on successful login
       navigate('/');
     } catch (err: any) {
@@ -61,9 +61,7 @@ export default function Login() {
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Email input field */}
           <div>
-            <label className="block text-sm font-medium mb-2 text-light-text dark:text-dark-text">
-              Email
-            </label>
+            <label className="block text-sm font-medium mb-2 text-light-text dark:text-dark-text">Email</label>
             <input
               type="email"
               value={email}
@@ -75,4 +73,41 @@ export default function Login() {
 
           {/* Password input field */}
           <div>
-            <label className="block text-sm font-medium
+            <label className="block text-sm font-medium mb-2 text-light-text dark:text-dark-text">Password</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-light-text dark:text-dark-text focus:outline-none focus:ring-2 focus:ring-light-primary dark:focus:ring-dark-primary"
+              required
+            />
+          </div>
+
+          {/* Error message display */}
+          {error && (
+            <div className="p-3 bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-200 rounded-lg">
+              {error}
+            </div>
+          )}
+
+          {/* Submit button */}
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full py-2 bg-light-primary dark:bg-dark-primary text-white font-semibold rounded-lg hover:opacity-90 disabled:opacity-50 transition-opacity"
+          >
+            {loading ? 'Logging in...' : 'Login'}
+          </button>
+        </form>
+
+        {/* Link to registration page */}
+        <p className="mt-6 text-center text-light-text dark:text-dark-text">
+          Don't have an account?{' '}
+          <a href="/register" className="text-light-primary dark:text-dark-primary hover:underline">
+            Register
+          </a>
+        </p>
+      </div>
+    </div>
+  );
+}
