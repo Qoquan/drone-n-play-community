@@ -1,22 +1,19 @@
-const express = require('express');
-const cors = require('cors');
-const dotenv = require('dotenv');
+import express from "express";
+import cors from "cors";
+import dotenv from "dotenv";
 
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = (process.env.PORT as string) || 3000;
 
-// Middleware
 app.use(cors());
 app.use(express.json());
 
-// Routes
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'OK', timestamp: new Date() });
+app.get("/api/health", (req: express.Request, res: express.Response) => {
+  res.json({ status: "OK", timestamp: new Date() });
 });
 
-// Start server
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
 });
