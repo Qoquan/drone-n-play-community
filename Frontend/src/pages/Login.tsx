@@ -39,11 +39,9 @@ export default function Login() {
 
       // Redirect to home page on successful login
       navigate('/');
-    } catch (err: any) {
-      // Display error message if login fails
-      // Common errors: invalid email/password, network error
-      setError(err.message || 'Login failed');
-    } finally {
+} catch (err) {
+  const message = err instanceof Error ? err.message : 'Login failed';
+  setError(message);    } finally {
       setLoading(false);
     }
   };

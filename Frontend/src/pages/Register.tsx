@@ -47,10 +47,9 @@ export default function Register() {
 
       // Redirect to home page on success
       navigate('/');
-    } catch (err: any) {
-      // Display error message if registration fails
-      setError(err.message || 'Registration failed');
-    } finally {
+} catch (err) {
+  const message = err instanceof Error ? err.message : 'Login failed';
+  setError(message);    } finally {
       setLoading(false);
     }
   };

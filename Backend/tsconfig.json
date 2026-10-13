@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "ES2020",
     "module": "esnext",
-    "moduleResolution": "node",  // ← AJOUTE CETTE LIGNE
+    "moduleResolution": "node",  
     "lib": ["ES2020", "dom"],
     "outDir": "./dist",
     "rootDir": "./src",

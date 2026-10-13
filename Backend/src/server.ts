@@ -25,8 +25,9 @@ app.post('/api/auth/register', async (req, res) => {
     const { email, password, name } = req.body;
     const result = await authService.register(email, password, name);
     res.status(201).json(result);
-  } catch (error: any) {
-    res.status(400).json({ error: error.message });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    res.status(400).json({ error: message });
   }
 });
 
@@ -35,8 +36,9 @@ app.post('/api/auth/login', async (req, res) => {
     const { email, password } = req.body;
     const result = await authService.login(email, password);
     res.json(result);
-  } catch (error: any) {
-    res.status(401).json({ error: error.message });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    res.status(401).json({ error: message });
   }
 });
 
@@ -54,9 +56,10 @@ app.get('/api/users/:id', authMiddleware, async (req: AuthRequest, res) => {
     }
 
     res.json(user);
-  } catch (error: any) {
-    res.status(500).json({ error: error.message });
-  }
+  } catch (error) {
+  const message = error instanceof Error ? error.message : String(error);
+  res.status(400).json({ error: message });
+}
 });
 
 app.listen(PORT, () => {
