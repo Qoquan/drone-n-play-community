@@ -1,0 +1,59 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int     @id @default(autoincrement())
+  email     String  @unique
+  username  String  @unique
+  password  String
+  avatar    String?
+  bio       String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  drones    Drone[]
+  posts     Post[]
+  followers User[]   @relation("UserFollows")
+  following User[]   @relation("UserFollows")
+}
+
+model Drone {
+  id        Int     @id @default(autoincrement())
+  name      String
+  model     String
+  owner     User    @relation(fields: [userId], references: [id])
+  userId    Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  flights   Flight[]
+}
+
+model Flight {
+  id        Int     @id @default(autoincrement())
+  drone     Drone   @relation(fields: [droneId], references: [id])
+  droneId   Int
+  startTime DateTime
+  endTime   DateTime?
+  latitude  Float
+  longitude Float
+  altitude  Float?
+  createdAt DateTime @default(now())
+}
+
+model Post {
+  id        Int     @id @default(autoincrement())
+  author    User    @relation(fields: [userId], references: [id])
+  userId    Int
+  content   String
+  image     String?
+  likes     Int     @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
