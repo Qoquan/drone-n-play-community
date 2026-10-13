@@ -14,13 +14,21 @@ model User {
   password  String
   avatar    String?
   bio       String?
+  role      String  @default("user") // user, moderator, admin
+  banned    Boolean @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  drones    Drone[]
-  posts     Post[]
-  followers User[]   @relation("UserFollows")
-  following User[]   @relation("UserFollows")
+  drones      Drone[]
+  posts       Post[]
+  comments    Comment[]
+  likes       Like[]
+  followers   Follow[] @relation("followers")
+  following   Follow[] @relation("following")
+  forumThreads ForumThread[]
+  forumPosts  ForumPost[] @relation("ForumPosts")
+  notifications Notification[]
+  bans        UserBan[]
 }
 
 model Drone {
@@ -47,13 +55,129 @@ model Flight {
   createdAt DateTime @default(now())
 }
 
+model Airport {
+  id        Int     @id @default(autoincrement())
+  code      String  @unique
+  name      String
+  latitude  Float
+  longitude Float
+  city      String
+  country   String
+  createdAt DateTime @default(now())
+}
+
 model Post {
   id        Int     @id @default(autoincrement())
   author    User    @relation(fields: [userId], references: [id])
   userId    Int
   content   String
   image     String?
-  likes     Int     @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  comments  Comment[]
+  likes     Like[]
+}
+
+model Comment {
+  id        Int     @id @default(autoincrement())
+  content   String
+  post      Post    @relation(fields: [postId], references: [id])
+  postId    Int
+  author    User    @relation(fields: [userId], references: [id])
+  userId    Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Like {
+  id        Int     @id @default(autoincrement())
+  post      Post    @relation(fields: [postId], references: [id])
+  postId    Int
+  user      User    @relation(fields: [userId], references: [id])
+  userId    Int
+  createdAt DateTime @default(now())
+
+  @@unique([postId, userId])
+}
+
+model Follow {
+  id          Int     @id @default(autoincrement())
+  follower    User    @relation("followers", fields: [followerId], references: [id])
+  followerId  Int
+  following   User    @relation("following", fields: [followingId], references: [id])
+  followingId Int
+  createdAt   DateTime @default(now())
+
+  @@unique([followerId, followingId])
+}
+
+model Forum {
+  id          Int     @id @default(autoincrement())
+  name        String  @unique
+  description String?
+  createdAt   DateTime @default(now())
+
+  threads ForumThread[]
+}
+
+model ForumThread {
+  id          Int     @id @default(autoincrement())
+  title       String
+  forum       Forum   @relation(fields: [forumId], references: [id])
+  forumId     Int
+  author      User    @relation(fields: [userId], references: [id])
+  userId      Int
+  pinned      Boolean @default(false)
+  locked      Boolean @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  posts       ForumPost[]
+  moderations ForumModeration[]
+}
+
+model ForumPost {
+  id          Int     @id @default(autoincrement())
+  content     String
+  thread      ForumThread @relation(fields: [threadId], references: [id])
+  threadId    Int
+  author      User    @relation("ForumPosts", fields: [userId], references: [id])
+  userId      Int
+  flagged     Boolean @default(false)
+  warned      Boolean @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  moderations ForumModeration[]
+}
+
+model ForumModeration {
+  id          Int     @id @default(autoincrement())
+  action      String  // pin, lock, move, delete, flag, warning, ban
+  reason      String?
+  thread      ForumThread? @relation(fields: [threadId], references: [id])
+  threadId    Int?
+  post        ForumPost? @relation(fields: [postId], references: [id])
+  postId      Int?
+  createdAt   DateTime @default(now())
+}
+
+model UserBan {
+  id          Int     @id @default(autoincrement())
+  user        User    @relation(fields: [userId], references: [id])
+  userId      Int
+  reason      String?
+  bannedUntil DateTime?
+  createdAt   DateTime @default(now())
+}
+
+model Notification {
+  id        Int     @id @default(autoincrement())
+  type      String  // comment, like, follow, etc
+  message   String
+  user      User    @relation(fields: [userId], references: [id])
+  userId    Int
+  read      Boolean @default(false)
+  createdAt DateTime @default(now())
 }

@@ -10,7 +10,8 @@
     "start": "node dist/server.js",
     "lint": "oxlint",
     "format": "prettier --write \"src/**/*.{ts,js,json}\"",
-    "postinstall": "prisma skills sync || exit 0"
+    "postinstall": "prisma skills sync || exit 0",
+    "seed": "tsx prisma/seed.ts"
   },
   "keywords": [],
   "author": "",
