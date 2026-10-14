@@ -14,8 +14,7 @@ import * as userService from '../services/user.service';
  */
 export const Profile: React.FC = () => {
   const { user, token } = useAuth();
-  const [profile, setProfile] = useState<any>(null);
-  const [stats, setStats] = useState<any>(null);
+  const [stats, setStats] = useState<{ totalDrones: number; totalFlights: number; totalFlightHours: number; maintenanceDrones: number; categories: Record<string, number> } | null>(null);  const [stats, setStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 

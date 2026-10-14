@@ -15,11 +15,9 @@ import { Navigation } from '../components/Navigation';
  */
 export const Drones: React.FC = () => {
   const { token } = useAuth();
-  const [drones, setDrones] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [drones, setDrones] = useState<{ id: number; name: string; brand: string; model: string; category: string; status: string; totalFlights: number; totalFlightHours: number }[]>([]);  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedDrone, setSelectedDrone] = useState<any>(null);
-  const [showForm, setShowForm] = useState(false);
+const [selectedDrone, setSelectedDrone] = useState<{ id: number; name: string; brand: string; model: string; serialNumber: string; weight: number; category: string; flightClass: string; status: string; totalFlights: number; totalFlightHours: number } | null>(null);  const [showForm, setShowForm] = useState(false);
   const [filters, setFilters] = useState({
     search: '',
     category: '',

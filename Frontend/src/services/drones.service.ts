@@ -6,18 +6,12 @@
  * - Récupération avec filtering et pagination
  * - Modification avec ownership check
  * - Suppression sécurisée
- * 
- * @author Claude Haiku 4.5
- * @version 1.0.0
  */
 
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-/**
- * Type pour les filtres de recherche de drones
- */
 interface DroneFilters {
   brand?: string;
   model?: string;
@@ -25,12 +19,9 @@ interface DroneFilters {
   status?: string;
   hasInsurance?: boolean;
   maintenanceRequired?: boolean;
-  search?: string; // Recherche sur nom, marque, modèle, serialNumber
+  search?: string;
 }
 
-/**
- * Type pour les options de pagination
- */
 interface PaginationOptions {
   limit: number;
   offset: number;
@@ -38,11 +29,6 @@ interface PaginationOptions {
 
 /**
  * Crée un nouveau drone pour un utilisateur
- * 
- * @param userId - ID de l'utilisateur propriétaire
- * @param data - Données du drone
- * @returns Le drone créé avec tous les détails
- * @throws Error si validation échoue ou erreur DB
  */
 export const createDrone = async (
   userId: number,
@@ -52,11 +38,11 @@ export const createDrone = async (
     model: string;
     serialNumber: string;
     photoUrl?: string;
-    weight: number; // en grammes
-    category: string; // C0-C4
-    flightClass: string; // A1-A3
-    maxFlightTime?: number; // en minutes
-    maxSpeed?: number; // en km/h
+    weight: number;
+    category: string;
+    flightClass: string;
+    maxFlightTime?: number;
+    maxSpeed?: number;
     cameraResolution?: string;
     registrationNumber?: string;
     registrationExpiry?: Date;
@@ -68,7 +54,6 @@ export const createDrone = async (
   }
 ) => {
   try {
-    // Validation basique
     if (!data.name || !data.brand || !data.model || !data.serialNumber) {
       throw new Error('Les champs nom, marque, modèle et numéro de série sont obligatoires');
     }
@@ -77,7 +62,6 @@ export const createDrone = async (
       throw new Error('Le poids doit être supérieur à 0');
     }
 
-    // Vérifier si le numéro de série existe déjà pour cet utilisateur
     const existingDrone = await prisma.drone.findFirst({
       where: {
         userId,
@@ -89,7 +73,6 @@ export const createDrone = async (
       throw new Error('Un drone avec ce numéro de série existe déjà dans votre flotte');
     }
 
-    // Créer le drone
     const drone = await prisma.drone.create({
       data: {
         userId,
@@ -116,17 +99,12 @@ export const createDrone = async (
     return drone;
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Erreur lors de la création du drone';
-    throw new Error(`Impossible de créer le drone: ${message}`);
+    throw new Error(message, { cause: error });
   }
 };
 
 /**
  * Récupère les drones d'un utilisateur avec filtering et pagination
- * 
- * @param userId - ID de l'utilisateur
- * @param filters - Filtres optionnels
- * @param pagination - Options de pagination
- * @returns Objet avec drones et nombre total
  */
 export const getDrones = async (
   userId: number,
@@ -134,12 +112,10 @@ export const getDrones = async (
   pagination: PaginationOptions = { limit: 10, offset: 0 }
 ) => {
   try {
-    // Construire les conditions WHERE
-    const whereConditions: any = {
-      userId, // Ownership check
+    const whereConditions: Record<string, unknown> = {
+      userId,
     };
 
-    // Filtrer par marque
     if (filters.brand) {
       whereConditions.brand = {
         contains: filters.brand,
@@ -147,7 +123,6 @@ export const getDrones = async (
       };
     }
 
-    // Filtrer par modèle
     if (filters.model) {
       whereConditions.model = {
         contains: filters.model,
@@ -155,22 +130,18 @@ export const getDrones = async (
       };
     }
 
-    // Filtrer par catégorie
     if (filters.category) {
       whereConditions.category = filters.category;
     }
 
-    // Filtrer par statut
     if (filters.status) {
       whereConditions.status = filters.status;
     }
 
-    // Filtrer par maintenance requise
     if (filters.maintenanceRequired !== undefined) {
       whereConditions.maintenanceRequired = filters.maintenanceRequired;
     }
 
-    // Recherche par texte (nom, marque, modèle, serialNumber)
     if (filters.search) {
       whereConditions.OR = [
         { name: { contains: filters.search, mode: 'insensitive' } },
@@ -180,18 +151,16 @@ export const getDrones = async (
       ];
     }
 
-    // Récupérer le nombre total de drones
     const total = await prisma.drone.count({
       where: whereConditions,
     });
 
-    // Récupérer les drones avec pagination
     const drones = await prisma.drone.findMany({
       where: whereConditions,
       skip: pagination.offset,
       take: pagination.limit,
       orderBy: {
-        createdAt: 'desc', // Les plus récents en premier
+        createdAt: 'desc',
       },
     });
 
@@ -204,25 +173,19 @@ export const getDrones = async (
     };
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Erreur lors de la récupération des drones';
-    throw new Error(`Impossible de récupérer les drones: ${message}`);
+    throw new Error(message, { cause: error });
   }
 };
 
 /**
  * Récupère un drone spécifique par ID
- * Vérifie que l'utilisateur est le propriétaire
- * 
- * @param droneId - ID du drone
- * @param userId - ID de l'utilisateur (pour ownership check)
- * @returns Le drone avec tous les détails
- * @throws Error si drone non trouvé ou pas propriétaire
  */
 export const getDroneById = async (droneId: number, userId: number) => {
   try {
     const drone = await prisma.drone.findFirst({
       where: {
         id: droneId,
-        userId, // Ownership check
+        userId,
       },
     });
 
@@ -233,18 +196,12 @@ export const getDroneById = async (droneId: number, userId: number) => {
     return drone;
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Erreur lors de la récupération du drone';
-    throw new Error(`Impossible de récupérer le drone: ${message}`);
+    throw new Error(message, { cause: error });
   }
 };
 
 /**
  * Met à jour un drone
- * Vérifie que l'utilisateur est le propriétaire
- * 
- * @param droneId - ID du drone
- * @param userId - ID de l'utilisateur (pour ownership check)
- * @param data - Données à mettre à jour (partielles)
- * @returns Le drone mis à jour
  */
 export const updateDrone = async (
   droneId: number,
@@ -268,7 +225,6 @@ export const updateDrone = async (
   }>
 ) => {
   try {
-    // Vérifier que le drone appartient à l'utilisateur
     const drone = await prisma.drone.findFirst({
       where: {
         id: droneId,
@@ -280,12 +236,10 @@ export const updateDrone = async (
       throw new Error('Drone non trouvé ou vous n\'avez pas accès à ce drone');
     }
 
-    // Validation
     if (data.weight !== undefined && data.weight <= 0) {
       throw new Error('Le poids doit être supérieur à 0');
     }
 
-    // Si serialNumber change, vérifier qu'il n'existe pas déjà
     if (data.serialNumber && data.serialNumber !== drone.serialNumber) {
       const existingDrone = await prisma.drone.findFirst({
         where: {
@@ -302,7 +256,6 @@ export const updateDrone = async (
       }
     }
 
-    // Mettre à jour le drone
     const updatedDrone = await prisma.drone.update({
       where: { id: droneId },
       data: {
@@ -314,22 +267,15 @@ export const updateDrone = async (
     return updatedDrone;
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Erreur lors de la mise à jour du drone';
-    throw new Error(`Impossible de mettre à jour le drone: ${message}`);
+    throw new Error(message, { cause: error });
   }
 };
 
 /**
  * Supprime un drone
- * Vérifie que l'utilisateur est le propriétaire
- * Archive les vols associés au lieu de les supprimer
- * 
- * @param droneId - ID du drone à supprimer
- * @param userId - ID de l'utilisateur (pour ownership check)
- * @returns Message de confirmation
  */
 export const deleteDrone = async (droneId: number, userId: number) => {
   try {
-    // Vérifier que le drone appartient à l'utilisateur
     const drone = await prisma.drone.findFirst({
       where: {
         id: droneId,
@@ -341,8 +287,6 @@ export const deleteDrone = async (droneId: number, userId: number) => {
       throw new Error('Drone non trouvé ou vous n\'avez pas accès à ce drone');
     }
 
-    // Archiver les vols associés au lieu de les supprimer
-    // (Les vols restent dans l'historique mais le drone est supprimé)
     await prisma.flight.updateMany({
       where: {
         droneId,
@@ -352,7 +296,6 @@ export const deleteDrone = async (droneId: number, userId: number) => {
       },
     });
 
-    // Supprimer le drone
     await prisma.drone.delete({
       where: { id: droneId },
     });
@@ -363,15 +306,12 @@ export const deleteDrone = async (droneId: number, userId: number) => {
     };
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Erreur lors de la suppression du drone';
-    throw new Error(`Impossible de supprimer le drone: ${message}`);
+    throw new Error(message, { cause: error });
   }
 };
 
 /**
  * Récupère les statistiques des drones d'un utilisateur
- * 
- * @param userId - ID de l'utilisateur
- * @returns Statistiques globales
  */
 export const getDroneStats = async (userId: number) => {
   try {
@@ -397,6 +337,6 @@ export const getDroneStats = async (userId: number) => {
     return stats;
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Erreur lors de la récupération des statistiques';
-    throw new Error(`Impossible de récupérer les statistiques: ${message}`);
+    throw new Error(message, { cause: error });
   }
 };

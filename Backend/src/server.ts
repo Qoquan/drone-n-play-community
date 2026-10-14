@@ -129,8 +129,7 @@ app.get('/api/drones', authMiddleware, async (req: AuthRequest, res) => {
     const offset = parseInt(req.query.offset as string) || 0;
 
     // Build filters
-    const filters: any = {};
-    if (req.query.brand) filters.brand = req.query.brand as string;
+    const filters: Record<string, unknown> = {};    if (req.query.brand) filters.brand = req.query.brand as string;
     if (req.query.model) filters.model = req.query.model as string;
     if (req.query.category) filters.category = req.query.category as string;
     if (req.query.status) filters.status = req.query.status as string;
