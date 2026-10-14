@@ -82,8 +82,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       // Store in localStorage
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
-    } catch (error: any) {
-      throw new Error(error.message || 'Login failed');
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Login failed';
+      throw new Error(message, { cause: error });
     } finally {
       setLoading(false);
     }
