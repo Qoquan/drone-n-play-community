@@ -1,4 +1,5 @@
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+// Backend API URL - uses environment variable or fallback to production URL
+const API_URL = import.meta.env.VITE_API_URL || 'https://drone-n-play-backend.onrender.com/api';
 
 export const apiClient = {
   async register(email: string, password: string, name: string) {
