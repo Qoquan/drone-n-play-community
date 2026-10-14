@@ -23,6 +23,13 @@ app.get('/api/health', (req, res) => {
 app.post('/api/auth/register', async (req, res) => {
   try {
     const { email, password, name } = req.body;
+
+    // Validation
+    if (!email || !password || !name) {
+      res.status(400).json({ error: 'Email, password, and name are required' });
+      return;
+    }
+
     const result = await authService.register(email, password, name);
     res.status(201).json(result);
   } catch (error) {
