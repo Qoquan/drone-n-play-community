@@ -82,7 +82,7 @@ const user = await prisma.user.findUnique({
  */
 app.post('/api/drones', authMiddleware, async (req: AuthRequest, res) => {
   try {
-    const { name, brand, model, serialNumber, weight, category, flightClass, photoUrl, maxFlightTime, maxSpeed, cameraResolution, registrationNumber, registrationExpiry, insurance } = req.body;
+    const { name, brand, model, serialNumber, weight, category, flightClass, photoUrl, maxFlightTime, maxSpeed, cameraResolution, registrationNumber, registrationExpiry } = req.body;
 
     // Basic validation
     if (!name || !brand || !model || !serialNumber || !weight || !category || !flightClass) {
@@ -104,7 +104,6 @@ app.post('/api/drones', authMiddleware, async (req: AuthRequest, res) => {
       cameraResolution,
       registrationNumber,
       registrationExpiry,
-      insurance,
     });
 
     res.status(201).json(drone);
@@ -112,7 +111,6 @@ app.post('/api/drones', authMiddleware, async (req: AuthRequest, res) => {
     res.status(400).json({ error: (error instanceof Error ? error.message : String(error)) });
   }
 });
-
 /**
  * GET /api/drones
  * Get user's drones with filtering and pagination

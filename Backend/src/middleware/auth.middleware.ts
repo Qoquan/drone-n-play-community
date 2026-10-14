@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { authService } from '../services/auth.service.js';
 
 export interface AuthRequest extends Request {
-  userId?: string;
+  userId?: number;
 }
 
 export const authMiddleware = (req: AuthRequest, res: Response, next: NextFunction): void => {
@@ -19,6 +19,6 @@ export const authMiddleware = (req: AuthRequest, res: Response, next: NextFuncti
     return;
   }
 
-  req.userId = decoded.userId;
+  req.userId = parseInt(decoded.userId, 10);
   next();
 };

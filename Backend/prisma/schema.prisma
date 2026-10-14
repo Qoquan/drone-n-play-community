@@ -33,17 +33,31 @@ model User {
 }
 
 model Drone {
-  id        Int     @id @default(autoincrement())
-  name      String
-  model     String
-  owner     User    @relation(fields: [userId], references: [id])
-  userId    Int
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id                  Int     @id @default(autoincrement())
+  userId              Int
+  name                String
+  brand               String
+  model               String
+  serialNumber        String  @unique
+  photoUrl            String?
+  weight              Int     // grammes
+  category            String  // C0-C4
+  flightClass         String  // A1-A3
+  maxFlightTime       Int?    // minutes
+  maxSpeed            Int?    // km/h
+  cameraResolution    String?
+  registrationNumber  String?
+  registrationExpiry  DateTime?
+  status              String  @default("ACTIVE") // ACTIVE, MAINTENANCE, INACTIVE
+  totalFlights        Int     @default(0)
+  totalFlightHours    Int     @default(0)
+  maintenanceRequired Boolean @default(false)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
 
+  owner     User    @relation(fields: [userId], references: [id])
   flights   Flight[]
 }
-
 model Flight {
   id        Int     @id @default(autoincrement())
   drone     Drone   @relation(fields: [droneId], references: [id])
